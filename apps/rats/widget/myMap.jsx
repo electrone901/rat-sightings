@@ -41,7 +41,7 @@ function Form({ data }) {
 
 return (
   <Widget
-    src="maps.near/widget/index"
+    src="map.near/widget/index"
     props={{
       markers: data,
       myMarkers: myData,
