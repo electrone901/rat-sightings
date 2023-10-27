@@ -130,7 +130,7 @@ return (
     }
     {state.showForm && (
       <Widget
-        src={"efiz.near/widget/map.form"}
+        src={"map.near/widget/form"}
         props={{
           data: state.focusedMarker || {},
           children: props.form,
@@ -141,7 +141,7 @@ return (
 
     {state.showInspect && (
       <Widget
-        src={"efiz.near/widget/map.inspect"}
+        src={"map.near/widget/inspect"}
         props={{
           focusedMarker: state.focusedMarker,
           children: props.inspect,
@@ -181,7 +181,7 @@ return (
     )}
 
     <Widget
-      src={"efiz.near/widget/map.map"}
+      src={"map.near/widget/map"}
       props={{
         API_URL,
         accessToken: MAP_TOKEN,
