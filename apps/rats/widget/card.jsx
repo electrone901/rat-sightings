@@ -1,7 +1,8 @@
-const { accountId, blockHeight } = props
-const { img, description } = JSON.parse(
+const { accountId, p, blockHeight } = props
+const { id, img, description } = JSON.parse(
   Social.get(`${accountId}/post/main`, blockHeight) || 'null',
 )
+console.log('🚀 ~ file: card.jsx:6 ~ id:', id)
 if (!description) {
   return <h2>No Reviews yet</h2>
 }
@@ -54,6 +55,10 @@ return (
         // fallbackUrl:
         //   'https://ipfs.near.social/ipfs/bafkreibmiy4ozblcgv3fm3gc6q62s55em33vconbavfd2ekkuliznaq3zm',
       }}
+    />
+    <Widget
+      src="rats.near/widget/VoteButton"
+      props={{ item: JSON.parse(id) }}
     />
   </div>
 )

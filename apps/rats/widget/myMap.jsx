@@ -108,7 +108,11 @@ State.init({
 const handleSave = () => {
   const data = {
     post: {
-      main: JSON.stringify({ description: state.description, img: state.img }),
+      main: JSON.stringify({
+        description: state.description,
+        img: state.img,
+        id: state.currentLocation.id,
+      }),
     },
     index: {
       post: JSON.stringify({
@@ -177,6 +181,8 @@ function Inspect(p) {
           },
         }}
         Item={(p) => {
+          console.log('__p:', p)
+          const id = state.currentLocation.id
           return <Widget src="rats.near/widget/card" props={p} />
         }}
       />
@@ -289,6 +295,7 @@ return (
         State.update({
           currentLocation: e,
         })
+        console.log('state.currentLocation.id,', e)
         // console.log('marker click___', e)
       },
       inspect: (p) => <Inspect {...p} />,
