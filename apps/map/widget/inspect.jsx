@@ -1,5 +1,6 @@
-const inspectWidget = props.inspectWidget;
-const focusedMarker = props.focusedMarker;
+const inspectWidget = props.inspectWidget
+const focusedMarker = props.focusedMarker
+const reviewData = props.reviewData || dummy
 
 const ModalOverlay = styled.div`
   position: absolute;
@@ -14,16 +15,16 @@ const ModalOverlay = styled.div`
     top: 54px;
     width: 96%;
   }
-`;
+`
 
 const ModalContent = styled.div`
   padding: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`
 
-const Children = props.children;
+const Children = props.children
 
 return (
   <ModalOverlay>
@@ -35,4 +36,4 @@ return (
       )}
     </ModalContent>
   </ModalOverlay>
-);
+)

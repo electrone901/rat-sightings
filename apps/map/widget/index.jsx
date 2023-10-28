@@ -1,13 +1,13 @@
-const MAP_STYLE = props.MAP_STYLE || "mapbox://styles/mapbox/outdoors-v12";
+const MAP_STYLE = props.MAP_STYLE || 'mapbox://styles/mapbox/outdoors-v12'
 const MAP_TOKEN =
   props.MAP_TOKEN ||
-  "pk.eyJ1IjoidGVqMDEiLCJhIjoiY2xqcHZ2dGpkMDB5azNsbzQ0bmMwNjRjaCJ9.FVv2zRPaLwzZMgagbI2YZw";
+  'pk.eyJ1IjoidGVqMDEiLCJhIjoiY2xqcHZ2dGpkMDB5azNsbzQ0bmMwNjRjaCJ9.FVv2zRPaLwzZMgagbI2YZw'
 
-const center = props.center || [-74.00597, 40.71427];
-const zoom = props.zoom || 10;
-const onSave = props.handleSave || (() => {});
-const formWidget = props.formWidget;
-const inspectWidget = props.inspectWidget;
+const center = props.center || [-74.00597, 40.71427]
+const zoom = props.zoom || 10
+const onSave = props.handleSave || (() => {})
+const formWidget = props.formWidget
+const inspectWidget = props.inspectWidget
 
 const Container = styled.div`
   display: flex;
@@ -19,7 +19,7 @@ const Container = styled.div`
   overflow: auto;
   position: relative;
   z-index: 100;
-`;
+`
 
 const Button = styled.button`
   background: #191a1a;
@@ -27,7 +27,7 @@ const Button = styled.button`
   color: white;
   z-index: 1;
   padding: 10px 22px;
-`;
+`
 
 const Profile = styled.div`
   position: absolute;
@@ -38,7 +38,7 @@ const Profile = styled.div`
     right: 15px;
     top: 15px;
   }
-`;
+`
 
 const Inspect = styled.div`
   position: absolute;
@@ -49,7 +49,7 @@ const Inspect = styled.div`
     right: 15px;
     top: 15px;
   }
-`;
+`
 
 const Location = styled.div`
   position: absolute;
@@ -58,17 +58,17 @@ const Location = styled.div`
     padding: 6px 15px;
     bottom: 15px;
   }
-`;
+`
 
 State.init({
   locations: [],
   edit: false,
-});
+})
 
 const handleSave = (data) => {
-  onSave && onSave(data);
-  State.update({ edit: false, showForm: false, showInspect: false });
-};
+  onSave && onSave(data)
+  State.update({ edit: false, showForm: false, showInspect: false })
+}
 
 function DownIcon() {
   return (
@@ -89,7 +89,7 @@ function DownIcon() {
       </mask>
       <path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipSDownOne0)" />
     </svg>
-  );
+  )
 }
 
 function LocationIcon() {
@@ -110,7 +110,7 @@ function LocationIcon() {
         <path d="M17.5 9.5c0 3.038-2 6.5-5.5 10.5c-3.5-4-5.5-7.462-5.5-10.5a5.5 5.5 0 1 1 11 0Z" />
       </g>
     </svg>
-  );
+  )
 }
 
 return (
@@ -120,17 +120,17 @@ return (
       <Profile>
         <Button
           onClick={() => {
-            State.update({ showForm: !state.showForm });
+            State.update({ showForm: !state.showForm })
           }}
         >
-          {`${state.showForm ? "Hide" : "Show"} Form`}
+          {`${state.showForm ? 'Hide' : 'Submit a rat sighting report.'} `}
           <DownIcon />
         </Button>
       </Profile>
     }
     {state.showForm && (
       <Widget
-        src={"map.near/widget/form"}
+        src={'map.near/widget/form'}
         props={{
           data: state.focusedMarker || {},
           children: props.form,
@@ -141,7 +141,7 @@ return (
 
     {state.showInspect && (
       <Widget
-        src={"map.near/widget/inspect"}
+        src={'map.near/widget/inspect'}
         props={{
           focusedMarker: state.focusedMarker,
           children: props.inspect,
@@ -153,9 +153,9 @@ return (
     {accountId && (
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <Location>
@@ -166,7 +166,7 @@ return (
                 : () => State.update({ edit: !state.edit })
             }
           >
-            {`${!state.edit ? "Edit" : "Save"}`}
+            {`${!state.edit ? 'Edit' : 'Save'}`}
             <LocationIcon />
           </Button>
           {state.edit && (
@@ -181,7 +181,7 @@ return (
     )}
 
     <Widget
-      src={"map.near/widget/map"}
+      src={'map.near/widget/map'}
       props={{
         API_URL,
         accessToken: MAP_TOKEN,
@@ -194,14 +194,14 @@ return (
         myMarkers: props.myMarkers,
         edit: state.edit,
         onMapClick: (e) => {
-          State.update({ currentLocation: e.coordinates, showInspect: false });
-          props.onMapClick && props.onMapClick(e);
+          State.update({ currentLocation: e.coordinates, showInspect: false })
+          props.onMapClick && props.onMapClick(e)
         },
         onMarkerClick: (e) => {
-          State.update({ focusedMarker: e, showInspect: true });
-          props.onMarkerClick && props.onMarkerClick(e);
+          State.update({ focusedMarker: e, showInspect: true })
+          props.onMarkerClick && props.onMarkerClick(e)
         },
       }}
     />
   </Container>
-);
+)

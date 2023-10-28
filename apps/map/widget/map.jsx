@@ -1,22 +1,23 @@
-const API_URL = props.API_URL || "";
+const API_URL = props.API_URL || ''
 const ACCESS_TOKEN =
   props.accessToken ||
-  "pk.eyJ1IjoiZWpsYnJhZW0iLCJhIjoiY2xrbmIwaW53MGE0NTNtbGsydWd2MmpyZSJ9.m1ZfEqv2fGet2zblGknT8A";
-const styleUrl = props.styleUrl || "mapbox://styles/mapbox/streets-v12"; // see https://docs.mapbox.com/api/maps/styles/#mapbox-styles
-const center = props.center || [-87.6298, 41.8781]; // starting position [lng, lat]
-const zoom = props.zoom || 9; // starting zoom
-const accountId = context.accountId;
-const markers = props.markers || [];
-const onMapClick = props.onMapClick || (() => {});
-const onMarkerClick = props.onMarkerClick || (() => {});
-const edit = props.edit || false;
+  'pk.eyJ1IjoiZWpsYnJhZW0iLCJhIjoiY2xrbmIwaW53MGE0NTNtbGsydWd2MmpyZSJ9.m1ZfEqv2fGet2zblGknT8A'
+const styleUrl = props.styleUrl || 'mapbox://styles/mapbox/streets-v12' // see https://docs.mapbox.com/api/maps/styles/#mapbox-styles
+const center = props.center || [-87.6298, 41.8781] // starting position [lng, lat]
+const zoom = props.zoom || 9 // starting zoom
+const accountId = context.accountId
+const markers = props.markers || []
+const onMapClick = props.onMapClick || (() => {})
+const onMarkerClick = props.onMarkerClick || (() => {})
+const edit = props.edit || false
 
 const markerAsset =
-  props.markerAsset || "https://i.ibb.co/w6QRm4h/Liberty-Map-Pin-Dark.png";
+  props.markerAsset || 'https://i.ibb.co/w6QRm4h/Liberty-Map-Pin-Dark.png'
 
-const myMarkers = props.myMarkers || [];
+const myMarkers = props.myMarkers || []
 const myMarkerAsset =
-  props.myMarkerAsset || "https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-512.png";
+  props.myMarkerAsset ||
+  'https://cdn4.iconfinder.com/data/icons/small-n-flat/24/map-marker-512.png'
 
 const code = `
 <!DOCTYPE html>
@@ -24,11 +25,11 @@ const code = `
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    
+
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-    
+
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    
+
     <style>
       body { margin: 0; padding: 0; }
       #map { position: absolute; top: 0; bottom: 0; width: 100%; }
@@ -36,11 +37,11 @@ const code = `
       .marker {
         background-image: url('${markerAsset}');
         background-size: cover;
-        width: 30px;
+        width: 45px;
         height: 45px;
         cursor: pointer;
       }
-      
+
       #mymarker {
         background-image: url('${myMarkerAsset}') !important;
       }
@@ -86,7 +87,7 @@ const code = `
     const map = new mapboxgl.Map({
         container: 'map', // container ID
         style: '${styleUrl}',
-        center: [${center[0]}, ${center[1]}], 
+        center: [${center[0]}, ${center[1]}],
         zoom: ${zoom}
     });
 
@@ -102,13 +103,13 @@ const code = `
 
       const markerInstance = markersById[marker.id];
       // markersById[marker.accountId];
-      
+
       if (markerInstance) {
           const el = markerInstance.getElement();
           // el.style.boxShadow = '0px 0px 10px 3px rgba(0,0,0,0.5)';
           selectedMarkerElement = el;
       }
-  
+
       // Post message with marker data
       window.parent.postMessage({
           handler: 'marker-click',
@@ -119,16 +120,16 @@ const code = `
     // Function to populate markers to the map
     function populateMarkers() {
         const markersData = ${JSON.stringify(markers)};
-        
+
         markersData.forEach(marker => {
-        
+
           try {
             const el = document.createElement('div');
             el.className = 'marker';
             el.dataset.id = marker.id;
-        
+
             if (myMarkers.some((it) => it.id === marker.id)) el.id = 'mymarker';
-            
+
             markersById[marker.id] = new mapboxgl.Marker(el)
                 .setLngLat([marker.lng, marker.lat])
                 .addTo(map);
@@ -136,7 +137,7 @@ const code = `
                 el.addEventListener('click', () => {
               event.stopPropagation();
 
-              handleMarkerClick(marker); 
+              handleMarkerClick(marker);
             });
           } catch (e) {
             console.log(e);
@@ -160,7 +161,7 @@ const code = `
         // if (markersById[accountId]) {
         //   markersById[accountId].remove();
         // }
-          
+
         const _el = document.getElementById("mymarker");
         const myel = _el ? _el : document.createElement('div');
         myel.className = 'marker';
@@ -183,7 +184,7 @@ const code = `
     </script>
   </body>
 </html>
-  `;
+  `
 
 const Container = styled.div`
   height: 100%;
@@ -195,7 +196,7 @@ const Container = styled.div`
   input {
     all: unset;
   }
-`;
+`
 
 return (
   <Container>
@@ -205,16 +206,16 @@ return (
       srcDoc={code}
       onMessage={(e) => {
         switch (e.handler) {
-          case "map-click": {
-            onMapClick(e.data);
-            break;
+          case 'map-click': {
+            onMapClick(e.data)
+            break
           }
-          case "marker-click": {
-            onMarkerClick(e.data);
-            break;
+          case 'marker-click': {
+            onMarkerClick(e.data)
+            break
           }
         }
       }}
     />
   </Container>
-);
+)
