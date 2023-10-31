@@ -1,11 +1,12 @@
 const dataTemp = fetch('https://data.cityofnewyork.us/resource/3q43-55fe.json')
-const data1 = dataTemp?.body
+const resultData = dataTemp?.body
 
-// const dataDic = {}
-const dataDic = []
-data1.forEach((item) => {
+const dataDic = {}
+// parse data
+resultData.forEach((item) => {
   const obj = {
     address: item.incident_address,
+    status: item.status,
     id: item.unique_key,
     lng: item.longitude,
     lat: item.latitude,
@@ -29,58 +30,17 @@ data1.forEach((item) => {
     address_type: item.address_type,
     intersection_street_2: item.intersection_street_2,
   }
-  dataDic.push(obj)
-  // if (!dataDic[incident_address]) {
-  //   dataDic[incident_address] = obj
-  //   dataDic[incident_address].count = 1
-  // } else {
-  //   dataDic[incident_address].count++
-  // }
+  if (!dataDic[item.unique_key]) {
+    dataDic[item.unique_key] = obj
+    dataDic[item.unique_key].count = 1
+  } else {
+    dataDic[item.unique_key].count++
+  }
 })
+// gets an ar of elements thats what we need to pass to our props
+const cleanData = Object.values(dataDic)
 
-const data = [
-  {
-    address: '2136 FREDRICK DOUGLAS BOULEVARD',
-    id: '59221403',
-    lng: -73.95566524448962,
-    lat: 40.80400000828247,
-  },
-  {
-    address: '219 SPENCER STREET',
-    id: '2',
-    lng: -73.95459320290446,
-    lat: 40.6917064422596,
-  },
-]
-
-const reviews = [
-  {
-    id: '1',
-    author: 'bear.near',
-    description: 'This bulding has rats',
-    img: {
-      url:
-        'https://cloudflare-ipfs.com/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE',
-    },
-  },
-  {
-    id: '2',
-    author: 'jay.near',
-    description: 'This bulding has more rats',
-    img: {
-      url:
-        'https://cloudflare-ipfs.com/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE',
-    },
-  },
-]
-const myData = [
-  {
-    id: '1',
-    lng: -73.93799209472691,
-    lat: 40.70073671683767,
-  },
-]
-
+// gets all markers  from /thing/reviewMarker
 const markers = Social.get(`*/thing/reviewMarker`, 'final', {
   subscribe: 'true',
 })
@@ -89,22 +49,25 @@ if (!markers) {
   return <></>
 }
 const dataMap = {}
-
 Object.keys(markers).forEach((accountId) => {
   if (markers[accountId].thing && markers[accountId].thing.reviewMarker) {
     const markerObj = JSON.parse(markers[accountId].thing.reviewMarker)
     dataMap[accountId] = { accountId, ...markerObj }
   }
 })
-
+// sets the state
 State.init({
+  variant: '',
+  title: '',
+  open: false,
+  isShowMore: false,
   img: '',
   locations: [],
   description: '',
   edit: false,
   currentLocation: (dataMap[accountId] && dataMap[accountId].coordinates) || {},
 })
-
+// prepares data to be post it
 const handleSave = () => {
   const data = {
     post: {
@@ -124,13 +87,31 @@ const handleSave = () => {
     },
   }
 
+  // post data to
   Social.set(data, {
     force: true,
     onCommit: () => {
-      State.update({ edit: false, showForm: false, showInspect: false })
+      State.update({
+        edit: false,
+        showForm: false,
+        showInspect: false,
+        open: true,
+        variant: 'success',
+        title: 'Success!',
+        description: 'Your review has been successfully save to the contract.',
+      })
     },
     onCancel: () =>
-      State.update({ edit: false, showForm: false, showInspect: false }),
+      State.update({
+        edit: false,
+        showForm: false,
+        showInspect: false,
+        variant: error,
+        open: true,
+        title: 'Failed!',
+        description:
+          'We could not  save your review, please try one more time.',
+      }),
   })
 }
 
@@ -152,7 +133,6 @@ const filesOnChange = (files) => {
   }
 }
 
-// Inspect is a local component
 function Inspect(p) {
   const { Feed } = VM.require('devs.near/widget/Module.Feed')
   Feed = Feed || (() => <></>) // make sure you have this or else it can break
@@ -167,8 +147,53 @@ function Inspect(p) {
         paddingBottom: '5rem',
       }}
     >
-      <p>{p.address}</p>
-      <pre>{JSON.stringify(p, null, 2)}</pre>
+      <h2>
+        {p.address}, {p.city} , {p.incident_zip}
+      </h2>
+
+      <p style={{ fontSize: '14px' }}>
+        <strong> Incident issue:</strong>
+        {p.descriptor}
+      </p>
+      <p style={{ fontSize: '14px' }}>
+        <strong> Incident status:</strong>
+        {p.status}
+      </p>
+
+      <p style={{ paddingTop: '6px', fontSize: '14px' }}>
+        <strong> Near to:</strong>
+        {p.cross_street_2} {p.intersection_street_1}
+      </p>
+      <p style={{ paddingTop: '6px', fontSize: '14px' }}>
+        <strong> Created date:</strong>
+        {p.created_date}
+      </p>
+      <p style={{ paddingTop: '6px', fontSize: '14px' }}>
+        <strong>Complaint type:</strong>
+        {p.complaint_type}
+      </p>
+
+      <pre
+        style={{ color: 'white' }}
+        onClick={() => {
+          State.update({ isShowMore: false })
+        }}
+      >
+        {state.isShowMore ? (
+          <button style={buttonBlueStyle}>See less</button>
+        ) : (
+          ''
+        )}
+      </pre>
+      <pre
+        style={{ backgroundColor: 'black', color: 'white' }}
+        onClick={() => {
+          State.update({ isShowMore: true })
+        }}
+      >
+        {state.isShowMore ? JSON.stringify(p, null, 2) : 'Show all'}{' '}
+      </pre>
+
       <h2 style={{ fontSize: '25px', fontWeight: 'bold' }}>Reviews</h2>
       <Feed
         index={{
@@ -181,7 +206,6 @@ function Inspect(p) {
           },
         }}
         Item={(p) => {
-          console.log('__p:', p)
           const id = state.currentLocation.id
           return <Widget src="rats.near/widget/card" props={p} />
         }}
@@ -190,15 +214,15 @@ function Inspect(p) {
   )
 }
 
-function Form({ data }) {
-  // const loc = fetch(
-  //   'https://api.geoapify.com/v1/ipinfo?&apiKey=0485481476634b4d98f7d337d4821f52',
-  // )
-  // if (loc.ok) {
-  //   const location = loc.body.location
-  //   console.log('🚀 ~ file: myMap.jsx:38 ~ Form ~ location:', location)
-  // }
-
+function Form() {
+  const buttonBlueStyle = {
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  }
   const formContainerStyle = {
     display: 'flex',
     flexDirection: 'column',
@@ -238,7 +262,6 @@ function Form({ data }) {
   return (
     <div style={{ backgroundColor: 'white', padding: '1rem' }}>
       <h1 style={formTitleStyle}>Submit Ticket</h1>
-      {/* UPLODER */}
       <div className="d-inline-block">
         {state.img ? (
           <img
@@ -262,7 +285,6 @@ function Form({ data }) {
         </Files>
       </div>
 
-      {/* FORM */}
       <textarea
         style={descriptionTextareaStyle}
         placeholder="Enter description"
@@ -272,34 +294,46 @@ function Form({ data }) {
       <button style={saveButtonStyle} onClick={handleSave}>
         Save
       </button>
-      {/*
-      <h1>Form</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <button onClick={() => handleSave('hello')}>Save</button> */}
     </div>
   )
 }
 
+const toggleClosed = () => {
+  State.update({ open: false, img: '', description: '' })
+}
 return (
-  <Widget
-    src="map.near/widget/index"
-    props={{
-      markerAsset: 'https://cdn-icons-png.flaticon.com/512/47/47240.png',
-      reviewData: reviews,
-      markers: dataDic,
-      myMarkers: myData,
-      onMapClick: (e) => console.log('map click', e),
-      onMarkerClick: (e) => {
-        // onclick pass address & query supabase, return everything from reports  where  address = passedAddress
-        // get the data and display using reviews widget
-        State.update({
-          currentLocation: e,
-        })
-        console.log('state.currentLocation.id,', e)
-        // console.log('marker click___', e)
-      },
-      inspect: (p) => <Inspect {...p} />,
-      form: (p) => <Form {...p} />,
-    }}
-  />
+  <div>
+    <Widget
+      src="map.near/widget/index"
+      props={{
+        markerAsset:
+          'https://creazilla-store.fra1.digitaloceanspaces.com/emojis/57992/rat-emoji-clipart-md.png',
+        reviewData: reviews,
+        markers: cleanData,
+        myMarkers: myData,
+        onMapClick: (e) => console.log('map click', e),
+        onMarkerClick: (e) => {
+          // onclick pass address & query supabase, return everything from reports  where  address = passedAddress
+          // get the data and display using reviews widget
+          State.update({
+            currentLocation: e,
+          })
+        },
+        inspect: (p) => <Inspect {...p} />,
+        form: (p) => <Form {...p} />,
+      }}
+    />
+
+    {/* this widget comes from rats/widget/toast whenever you are ready to publish the widget it needs to be change so it referes to the correct publish widget, no longer the local widger. eg: byalbert.near/widget/toast  */}
+    <Widget
+      src="rats.near/widget/toast"
+      props={{
+        variant: state.variant,
+        open: state.open,
+        toggleClosed,
+        title: state.title,
+        description: state.description,
+      }}
+    />
+  </div>
 )
